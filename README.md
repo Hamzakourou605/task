@@ -68,3 +68,47 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+---
+
+## Fonctionnalités personnalisées du projet
+
+Le cœur du projet est un gestionnaire de **tâches** avec des **catégories dynamiques** (appelées "lists"). Voici ce qui a été ajouté et comment l'ensemble fonctionne :
+
+1. **État des catégories**
+   - `App.js` contient désormais :
+     ```js
+     const [categories, setCategories] = useState(["Personnel", "Work"]);
+     ```
+   - Cet état est transmis en props à `AddTask` et `NavComponant` pour que les deux composants utilisent la même liste de catégories.
+
+2. **Ajout de tâches** (`src/task/modifiertasks/addtask.js`)
+   - Le formulaire propose un `NavDropdown` rempli par la prop `categories`.
+   - Lorsque l'utilisateur choisit "Add new list", un `prompt` lui demande le nom, puis on ajoute la nouvelle catégorie via `setCategories`.
+   - Au moment de l'ajout, chaque tâche contient un champ `category` qui correspond à ce que l'utilisateur a sélectionné.
+
+3. **Navigation dynamique** (`src/nav/nav.js`)
+   - Le menu calcule `countsByCategory` en parcourant les tâches :
+     ```js
+     const countsByCategory = categories.reduce((acc, cat) => {
+       acc[cat] = taskList.filter((t) => t.category === cat).length;
+       return acc;
+     }, {});
+     ```
+   - Chaque catégorie est affichée avec son badge de compteur. Le lien "Add New List" déclenche le même `prompt` que dans le formulaire pour créer une catégorie.
+
+4. **Flux de travail pour l'utilisateur**
+   - Choisir ou créer une catégorie dans `AddTask` avant de soumettre.
+   - La tâche apparaît instantanément dans la liste `Modifiers`/`List` et renverra un décompte dans la nav.
+   - Ajouter une liste via le menu ou le formulaire met à jour l'autre composant automatiquement, car ils partagent le même état.
+
+5. **Étapes pour le développeur**
+   - `App.js` : maintenir `taskList` et `categories` + passer les props nécessaires.
+   - `AddTask.js` : consommer `categories` et `setCategories`, gérer la sélection, et générer l'objet `newTask`.
+   - `nav/nav.js` : consommer les mêmes props, calculer les totaux et permettre l'ajout.
+   - `modifiertasks/list.js` et `modifiertasks/modifee.js` restent inchangés mais peuvent être étendus pour filtrer par catégorie.
+
+En suivant ce modèle, tu peux étendre l'application : ajouter des filtres par catégorie dans la liste, stocker les données dans `localStorage`, connecter à un backend, etc.
+
+Bonne exploration ! N'hésite pas à lire chaque composant pour comprendre le fonctionnement et à modifier petit à petit.
+# tst
